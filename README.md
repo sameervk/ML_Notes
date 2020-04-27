@@ -10,6 +10,6 @@ Compilation of useful information for applying ML (including DL).
 	4. Unsupervised Learning
 	5. Forecasting/Sequence modeling
 
-* Anomaly detection has a brief overview of the relevant algorithms only.
+* Anomaly detection is a work in progress; has a very brief introduction with an arXiv link to one of the popular papers on the topic.
 
 * All documents will be continuously updated.
