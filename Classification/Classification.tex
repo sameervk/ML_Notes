@@ -1,0 +1,538 @@
+\documentclass[a4paper, 12pt]{report}
+
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{amsmath}
+\usepackage{mathtools}
+
+\usepackage{lipsum} %for random text: use as \lipsum[num1 or num1-num2]
+
+\usepackage{color} %can change the background of the text also
+
+
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries}{}{0pt}{\Huge}
+
+\setlength{\parindent}{0in}
+
+
+\begin{document}
+\title{Notes on Classification}
+\author{Sameer Kesava PhD}
+%\date{\today} % or {Month year}
+\maketitle
+
+\pagenumbering{roman}
+\tableofcontents
+\newpage
+
+\pagenumbering{arabic}
+
+%\setcounter{section}{0}
+
+%-----------------------------------
+\chapter{Improving the Accuracy}
+A robust and accurate model can be achieved by tackling the \textbf{bias-variance} problem.
+
+\begin{eqnarray}
+Bias & = & <\hat{f}(X)> - f(X)\\
+Variance & = & <\hat{f}(X){^{2}}> - <\hat{f}(X)>{^{2}}\\
+<[f(X) - \hat{f}(X)]{^{2}}> & = & Bias{^{2}} + Variance
+\end{eqnarray}
+
+%%----------------
+\section{Weights}
+\label{sec:weights}
+\begin{enumerate}
+\item Sample or Class weights can be used to improve the prediction accuracy, e.g. assigning large penalties to wrong predictions of the minority class using the 'class weight' parameter.
+\item Alternatively, a user-defined function can be supplied to compute the weights.
+\item Weighted micro and macro-averaging useful for scoring imbalanced datasets.
+
+\subsection{ML}
+
+\subsection{DL}
+\begin{enumerate}
+\item A good starting values for the initializers are Glorot-Xavier or Orthogonal for the weights.
+\item For the bias, zeros suffice.
+\end{enumerate}
+\end{enumerate}
+%%----------------
+
+\section{Cross Validation}
+\begin{itemize}
+\item Can also use \textbf{\textit{Bootstrap}}.
+\item Once the best model is chosen through CV, then the model should be trained on the whole dataset for the final model.
+\end{itemize}
+\begin{enumerate}
+\item Use k-fold CV. k = 10 is a good starting value.
+\item Use stratified k-fold to preserve class proportions.
+\end{enumerate}
+
+%%----------------
+
+\section{Regularization}
+\label{sec:regularization}
+\subsection{LASSO or L1-norm}
+A useful feature selection technique
+
+\subsection{Ridge Regression or L2-norm}
+
+\subsection{L1-L2 norm}
+\begin{itemize}
+\item Implemented as ElasticNet in {\color{red}scikit-learn}.
+\end{itemize}
+%%----------------
+\section{Brute-Force}
+\label{sec:bruteforce}
+
+Brute-force algorithm is effective for small datasets.\\
+Query time grows as O[pn], where p is the number of features/predictors/dimensions and n is no. of data points.
+%%----------------
+
+\section{Small Dataset}
+Also see \nameref{sec:augmentdata} \autoref{sec:augmentdata}.
+\label{sec:smalldatasize}
+n: number of samples\\
+p: number of features/predictors
+
+
+When p $>$ n, then there is no unique solution - variance is $\infty$.
+\subsection{When p is comparable to n}
+\begin{enumerate}
+
+\item Use shrinkage methods such as Lasso or L1 norm with k-fold CV for feature selection.
+%\item Check \hyperref[bruteforce]{\ref{bruteforce}}.
+\item Check \nameref{sec:bruteforce} \autoref{sec:bruteforce}.
+
+\end{enumerate}
+
+\subsection{p ${\ll}$ n}
+\begin{enumerate}
+\item Use k-fold CV.
+\end{enumerate}
+
+\subsection{Batch Size}
+If feasible, training should be tried on the whole data at once rather than splitting into mini-batches.
+
+
+
+%%----------------
+\section{Class Imbalance}
+Class imbalances can be handled using the following approaches.
+\begin{itemize}
+\item Upsampling.
+\item Downsampling.
+\item Generation of synthetic training samples using methods such as SMOTE.
+\item Data augmentation; see \autoref{sec:augmentdata}. 
+\end{itemize}
+
+%%----------------
+
+\section{Ensemble Learning}
+Random Forest, for example, is a type of ensemble learning method as different trees train on {\color{red}different subsets of the samples(?)}.
+
+\begin{itemize}
+\item Use Nested CV for ensemble learning.
+\item Boosting
+\item Bagging
+\item Stacking
+\item Majority/Plurality voting for multiclass setting.
+\item Cloning estimators ({\color{cyan}sklearn.base import clone}) for fitting on different formats of training data.
+\end{itemize}
+
+\subsection{Bagging}
+\label{subsec:bagging}
+\begin{itemize}
+\item Also called Bootstrap aggregation.
+\item Used in Random Forests, random feature subsets are selected with replacement.
+\item Improves accuracy of unstable models; at the expense of interpretability.
+\item Reduces overfitting by reducing variance.
+\item No. of trees is not a critical parameter; using large no. does not lead to overfitting when using bagging.
+\item Out-of-Bag MSE 
+\begin{enumerate}
+\item For quantifying test error without the need of CV.
+\item Convenient when working with large datasets as CV could be computationally onerous.
+\item For sufficiently large B, OOB error is virtually equivalent to LOOCV error.
+\end{enumerate} 
+\item Variable Importance measures for feature importance.
+\item Ineffective in reducing model bias. Hence, should be used in conjunction with ensemble classifiers with low bias such as unpruned decision trees, i.e. where max$\_$depth = 0.
+\end{itemize}
+
+\subsection{Boosting}
+\label{subsec:boosting}
+\begin{itemize}
+\item Does not involve bootstrap sampling.
+\item Boosting learns \textbf{slowly}. In general, statistical learning methods that learn slowly tend to perform well.
+\item Boosting with trees: no. of trees affects the extent of overfitting. Hyperparameters are
+\begin{enumerate}
+\item No. of trees. Small no. aids in model interpretability.
+\item Shrinkage $\lambda$
+\item Interaction depth
+\end{enumerate}
+\item Adaptive Boosting ({\color{cyan}from sklearn.ensemble import AdaBoostClassifier})
+\begin{enumerate}
+\item Focus on samples that are hard to classify.
+\item Can lead to decrease in both bias and variance.
+\item Uses an ensemble of classifiers: the i+1th learner has it's input the output of the ith learner.
+\end{enumerate}
+\end{itemize}
+
+\subsection{Stacking}
+\begin{itemize}
+\item For reducing bias.
+\item Uses different learners and then a meta-learner in the end which takes the output of different learners to  yield the response.
+\end{itemize}
+
+%%----------------
+\section{Augmenting Data}
+\label{sec:augmentdata}
+Accuracy can be improved by augmenting to the data and then fitting the model with both the original and augmented datasets. Some examples are
+
+\begin{itemize}
+\item Adding random noise to the data.
+\item In case of images, random rotations of the images.
+\end{itemize}
+
+%%----------------
+\section{Hyperparameter Tuning}
+\begin{itemize}
+\item Hyperparameter optimization based on Gaussian Process Regression and Bayesian Optimization
+\item keras tuner in keras
+\item GridSearchCV or RandomSearchCV in scikit-learn
+\item RandomSearch can be used as the baseline against which optimization algorithms can be evaluated.
+\end{itemize}
+
+%-----------------------------
+\chapter{ML Methods}
+Attempt statistical ML methods before DL.
+
+%%----------------
+\section{Bayes Classifier}
+Since the true distribution is not known, Bayes Classifier cannot be calculated.
+
+%%----------------
+\section{Random Classifier}
+For comparison with ML models.
+\begin{enumerate}
+\item Random shuffling of a copy of test labels in an array or tensor.
+\item Equating to the original, unshuffled copy.
+\item The percentage of True values give
+\end{enumerate}
+
+%%----------------
+\section{Naive Bayes Classifier}
+Highly useful for text classification, works well for relatively small datasets and computationally efficient. 
+
+%%----------------
+
+\section{Logistic Regression}
+\label{sec:logreg}
+\begin{itemize}
+\item Can be used as the base model.
+\item The function is gives the conditional distribution of response Y, given predictors X.
+\item Quadratic logistic regression can also be tried.
+\item \textbf{GAMs} (see Regression document) can also be explored with logistic regression for multivariate data.
+\item It is closely related to \nameref{sec:svm} \autoref{sec:svm}.
+\item When there are more than 2 classes, there are 2 approaches:
+\begin{enumerate}
+\item One-vs-One
+\item One-vs-All
+\end{enumerate}
+
+\end{itemize}
+
+%%----------------
+\section{Linear Discriminant Analysis}
+LDA classifier assumes that the observations are drawn from classes with a normal distribution of predictors while sharing a common variance $\sigma^2$.
+
+%%----------------
+\section{Quadratic Discriminant Analysis}
+QDA classifier assumes that the observations are drawn from classes with a normal distribution of predictors but not sharing a common variance $\sigma^2$.
+
+%%----------------
+\section{Support Vector Machine}
+\label{sec:svm}
+\begin{itemize}
+\item Hyperparameter C controls the bias-variance tradeoff.
+\item Non-linear decision boundaries can be addressed by enlarging the feature space using higher order polynomial terms.
+\item Kernels
+\begin{enumerate}
+\item Linear kernel: quantified using Pearson correlation.
+\item Kernels for non-linear decision boundaries: polynomial, radial.
+\end{enumerate}
+\item Very low sensitivity, like \nameref{sec:logreg}, to observation far from the decision boundary.
+\item When classes are well-separated, SVMs tend to behave better than logistic regression, and in more overlapping regimes, logistic regression is often preferred.
+\end{itemize}
+
+%%----------------
+\section{Decision Tree}
+\begin{itemize}
+\item Does not require any data transformation, i.e. scaling, before training.
+\item \textbf{Gini-impurity} and \textbf{entropy} are the measures of impurity.
+\item The splitting is based on a top-down, greedy approach. At each node, search is carried out for the best predictor and cut-off point by minimizing RSS in the case of regression.
+\item Tree pruning for reducing variance.
+\item Sometimes, the splits will yield terminal nodes that have the same predicted value. This is performed because it leads to node purity increase, which helps in the confidence in predictions.
+\item Sometimes, even if under-performing compared to linear models, trees are preferred for the sake of interpretability.
+\end{itemize}
+%%----------------
+\section{Random Forest}
+\begin{itemize}
+\item Ensemble of decision trees.
+\item Random Forest with m = p is bagging trees, where m is the number of predictors out of p chosen for splitting.
+\item This is an improvement over bagging trees by way of a method that decorrelates the trees.
+\item Can use large no. of trees for the test error rate to settle down, i.e. test error vs no. of trees.
+\item OOB (see \nameref{subsec:bagging} \autoref{subsec:bagging}) for test error rate.
+\end{itemize}
+
+%%----------------
+\section{XGBoost}
+Highly popular classifier and regressor. 
+\begin{itemize}
+\item Gradient boosting method
+\item Absolute loss and Huber loss more robust to outliers.
+\end{itemize}
+
+%%----------------
+\section{Latent Dirichlet Allocation}
+\begin{itemize}
+\item Unsupervised Learning
+\item For topic modeling, e.g. classifying a newspaper as a topic.
+\item {\color{cyan}scikit-learn lda module} for batch and online learning.
+\end{itemize}
+
+%-----------------------------
+\chapter{DL Methods}
+All operations, e.g. loss functions, activation functions, in neural networks must be differentiable.
+
+%%----------------
+\section{Binary Classification}
+\begin{itemize}
+\item Should end with a dense layer of 1 unit and a sigmoid activation function.
+\item The loss function should be binary cross-entropy.
+\end{itemize}
+
+
+%%----------------
+\section{CNN}
+\label{sec:cnn}
+\begin{itemize}
+\item In CNNs, the higher the layer is, the more specialized it is. The first few layers learn very simple and generic features which generalize to almost all types of images. The higher the layer is, the features learnt are increasingly specific to the dataset on which the model is trained.
+\item {\color{red}Invariance is hard-coded in CNNs.(?)}
+\end{itemize}
+
+\subsection{Spatial Pyramid Pooling Layer}
+For images of arbitrary dimensions (width and height).\\
+Majority of transfer learning models require input data with square dimensions, i.e. width = height.
+
+%------------------------------
+\chapter{Loss Functions}
+Loss functions must be defined carefully based on the problem statement.\\
+
+In multiclass datasets, if each data point belongs to a single class, then the problem is \textbf{"single label, multiclass classification"}. If it could belong to multiple categories. e.g. topics of newspaper articles, image classification, then the problem is \textbf{"multilabel, multiclass classification"}.
+
+
+\section{Metrics for Quantifying Test Errors}
+\begin{enumerate}
+\item Adjusted R${^2}$
+\item C${_p}$
+\item AIC
+\item BIC
+\end{enumerate}
+
+%%----------------
+\section{Sparse Categorical Cross Entropy}
+To be used when the labels are not one-hot encoded.
+%%----------------
+\section{Binary Cross Entropy}
+\begin{enumerate}
+\item If the labels have only 2 unique values, preferably [0,1] or [-1,1].
+\item Use sigmoid activation function for [0,1] and tanh for [-1,1].
+\end{enumerate}
+
+%%----------------
+\section{Kullback-Leibler Divergence}
+If each label is a probability distribution, e.g. image segmentation.
+
+\section{Perplexity}
+Loss function = e$^{Loss}$
+%------------------------------
+\chapter{Optimizers}
+\begin{enumerate}
+\item If the training and validation accuracies with epoch jump around, then learning rate must be reduced.
+\end{enumerate}
+
+%%----------------
+\section{Stochastic Gradient Descent}
+\begin{itemize}
+\item[-] For training one sample at a time.
+
+\item[-] For online learning.
+\end{itemize}
+
+%%----------------
+\section{Mini-batch Gradient Descent}
+\begin{itemize}
+\item[-] For mini-batches typically of the order of 2$^x$ for GPU compatibility.
+\item[-] Examples are Adam, Adagrad, RMSProp, etc.
+\end{itemize}
+
+%%----------------
+\section{Momentum}
+Helps address convergence speed and local minima.
+
+\subsection{Nesterov}
+
+%------------------------------
+\chapter{Overfitting}
+\begin{itemize}
+\item Random perturbation of the input data, e.g. images, to improve generalization.
+\end{itemize}
+%%----------------
+\section{ML}
+- See \nameref{subsec:bagging} \autoref{subsec:bagging}
+
+%%----------------
+\section{DL}
+\begin{itemize}
+\item More data
+\item L1, L2, L1L2 regularization
+\item Dropout
+\item Batch Normalization
+\item Reduce the complexity of the network especially if the data size is small.
+\item Early stopping
+\item Add noise. See \nameref{sec:augmentdata} \autoref{sec:augmentdata}.
+\end{itemize}
+
+\subsection{Dropout}
+\begin{itemize}
+\item Dropout functions
+\begin{enumerate}
+\item Gaussian Dropout
+\end{enumerate}
+\end{itemize}
+
+
+
+%------------------------------
+\chapter{Diagnostic Tools}
+To gauge the performance of a learning algorithm, i.e. if a model suffers from high variance or high bias.
+\begin{itemize}
+
+
+\item[-] If the accuracies are lower than the desired accuracy, then the model has high bias. This can be resolved by increasing the complexity of the model.
+
+\item[-] If val. acc. $<$ train. acc, then this could be resolved by
+\begin{enumerate}
+\item Collecting more data
+\item Increasing regularization strength
+\item Feature selection (L1 norm or LASSO)
+\item Feature extraction (PCA, UMAP)
+\item Reducing model complexity
+\end{enumerate}
+
+\end{itemize}
+
+%%----------------
+\section{Confusion Matrix}
+Class specific performance is crucial in medicine, biology, finance, etc.
+
+Metrics in sklearn.metrics module.
+
+\subsection{Precision}
+TP/(TP+FP)
+
+\subsection{Sensitivity or Recall}
+TP/P
+
+\subsection{Specificity}
+1 - FP/N
+
+%%----------------
+\section{ROC Curve}
+AUC value close to 1 implies a good classifier.
+
+Crucial when working with imbalanced classes.
+
+%%----------------
+\section{F1-score}
+
+$$2 \frac{PRE \ast REC}{PRE + REC}$$
+
+
+%%----------------
+\section{Learning Curves}
+Plotting training and validation accuracies as a function of training data set size.
+
+sklearn.model$\_$selection.learning$\_$curve
+
+%%----------------
+\section{Validation Curves}
+Plotting validation losses/accuracies as a function of epochs/iterations.
+
+sklearn.model$\_$selection.validation$\_$curve
+
+%%----------------
+\section{Test Error vs p}
+\begin{itemize}
+\item If there are large no. of perdictors, then plotting test error vs p should give an idea of the number of predictors.
+\item Test error typically increases with number of predictors if the additional predictors are not related to the response.
+\item In high p scenario, multicollinearity between predictors is extreme. See VIF in Data$\_$Preprocessing.
+\end{itemize}
+%%----------------
+\section{MSE vs R$^2$}
+
+%%----------------
+\section{Custom Scorer}
+Custom scorer function can be used with sklearn.make$\_$scorer.
+%------------------------------
+\chapter{Statistical Tests}
+
+%%----------------
+\section{Bootstrap}
+Sampling with replacements, used to quantify the uncertainty in the parameter estimates.
+
+%%----------------
+\section{T-statistic}
+When you run a hypothesis test, you use the T statistic with a p value. 
+
+\begin{align}
+	t-statistic = \frac{\hat{\beta}}{SE(\hat{\beta})}
+\end{align}
+
+$\hat{\beta}$ is the coefficient estimate from the fitting.
+
+%%----------------
+\section{Z-statistic or Z-score}
+\paragraph{statisticshowto.com:} Simply put, a z-score (also called a standard score) gives you an idea of how far from the mean a data point is. But more technically it’s a measure of how many standard deviations below or above the population mean a raw score is.
+
+A z-score can be placed on a normal distribution curve. Z-scores range from -3 standard deviations (which would fall to the far left of the normal distribution curve) up to +3 standard deviations (which would fall to the far right of the normal distribution curve). In order to use a z-score, you need to know the mean μ and also the population standard deviation σ.
+
+Z-scores are a way to compare results to a “normal” population. Results from tests or surveys have thousands of possible results and units; those results can often seem meaningless. For example, knowing that someone’s weight is 150 pounds might be good information, but if you want to compare it to the “average” person’s weight, looking at a vast table of data can be overwhelming (especially if some weights are recorded in kilograms). A z-score can tell you where that person’s weight is compared to the average population’s mean weight.
+
+%%----------------
+\section{Confidence Interval}
+For normally distributed error, 95\% confidence interval corresponds to 2$\sigma$.
+
+%------------------------------
+\chapter{Definitions}
+
+\section{Images}
+\begin{enumerate}
+
+\item \textbf{Aliasing}: Images with object boundaries as jagged edges. 
+\item \textbf{Anti-Aliasing}: Smoothening the boundaries to remove the jagged edges.
+
+\end{enumerate}
+
+
+
+
+\end{document}
+
+
+
+% Notes
+% 1. Several empty lines are treated as one empty line.
+% 2. The main function of an empty line is to start a new paragraph.
+% 3. In general, LATEX ignores blank lines and other empty space in the .tex file. Two backslashes (\\) can be used to start a new line.
+% 4. If you want to add blank space into your document use the \vspace{...} command.\vspace{12pt} will add space equivalent to the height of a 12pt font.

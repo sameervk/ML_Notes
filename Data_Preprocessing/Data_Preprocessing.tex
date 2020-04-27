@@ -1,0 +1,258 @@
+\documentclass[a4paper, 12pt]{report}
+
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{titlesec}
+
+\usepackage{lipsum} %for random text: use as \lipsum[num1 or num1-num2]
+
+\usepackage{color} %can change the background of the text also
+
+
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries}{}{0pt}{\Huge}
+
+\setlength{\parindent}{0in}
+
+\begin{document}
+\title{Notes on Exploratory Data Analysis and Data Preprocessing}
+\author{Sameer Kesava PhD}
+%\date{\today} % or {Month year}
+\maketitle
+
+\pagenumbering{roman}
+\tableofcontents
+\newpage
+
+\pagenumbering{arabic}
+
+%\setcounter{section}{0}
+
+%------------------------------------------
+\chapter{Exploratory Data Analysis}
+\begin{itemize}
+\item Unsupervised learning must be carried out as part of EDA.
+\item How the features are represented, i.e. feature engineering, makes a huge difference in the performance of ML algorithms.
+
+\end{itemize}
+
+%------------------------------------------
+\chapter{Correlations between Features}
+
+\section{Variance Inflation Factor}
+\begin{itemize}
+\item Implemented in {\color{green}StatsModel}.
+\item Rule of Thumb: if VIF$>$5 or 10, this indicates significant collinearity between features.
+
+\end{itemize}
+
+\section{Correlation Matrix}
+
+Pearson correlation coefficient
+
+\begin{align}
+	r = \frac{\sigma{_{xy}}}{\sigma{_{x}}\sigma{_{y}}}
+\end{align}
+
+%------------------------------------------
+\chapter{Scaling}
+Scaling is not needed in classifiers using Decision trees such as RandomForest.
+
+
+
+%------------------------------------------
+\chapter{Dimensionality Reduction}
+
+Two main categories: 1). feature selection 2). feature extraction
+
+%%----------------------
+\section{ML Algorithms}
+\paragraph{The algorithms for reducing the number of features in the input data.}
+
+\subsection{Random Forest}
+\label{randomforest}
+- Feature importances can be used to select features without making an assumption if the features are linearly separable or not.
+
+\subsection{Principal Component Analysis}
+\label{PCA}
+
+Popular applications of PCA:
+\begin{enumerate}
+\item EDA
+\item Denoising of signals, e.g. stock market data, genome data and gene expression levels.
+\end{enumerate}
+
+The features should be standardized to a $\sigma$=1 and, preferably, $\mu$=0 before using PCA. 
+
+\vspace{12pt}
+Kernels:
+\begin{enumerate} %itemsize for bulleted list
+
+\item {\color{red}Linear}
+\item {\color{red}Radial (RBF)}: for non-linear datasets.
+\begin{itemize}
+%any symbol or word can be used in []
+\item[-] Gaussian kernel function: $\gamma$ is the hyperparameter.
+\end{itemize}
+
+\end{enumerate}
+
+
+PCA tends to perform well in cases where most of the information is captured by the first few principal components. This can be obtained as variance explained ratios implemented in sklearn as pca.explained\_variance\_ratio\_, and plotted as a \textbf{Scree plot} (elbow points in this plot gives an estimate for the choice of no. of PCs to choose for further processing).
+
+\paragraph{Biplots:}for visualizing PC scores and loading vectors.
+
+
+\subsection{Linear Discriminant Analysis}
+LDA classifier assumes that the observations are drawn from classes with a normal distribution of predictors while sharing a common variance $\sigma^2$.
+
+
+\subsection{Quadratic Discriminant Analysis}
+QDA classifier assumes that the observations are drawn from classes with a normal distribution of predictors but not sharing a common variance $\sigma^2$.
+
+
+\subsection{UMAP}
+\begin{itemize}
+\item Feature extraction method
+\item Non-linear dimensionality reduction
+\item Other such methods are \textbf{triMAP}.
+\item t-SNE is only for visualization and not for data preprocessing.
+\end{itemize}
+
+
+\subsection{Dendogram}
+- For visualization of high-dimensional data.
+
+%%----------------------
+\section{Small Dataset}
+Also see \nameref{sec:augmentdata} \autoref{sec:augmentdata}.
+
+\label{smalldatasize}
+n: number of samples\\
+p: number of features/predictors
+
+Use Leave-One-Out-CV (LOOCV) for \textbf{\textit{very small datasets}}.
+
+\subsection{When p is comparable to n}
+\begin{enumerate}
+
+\item Use shrinkage methods such as Lasso or L1 norm.
+
+\end{enumerate}
+
+
+\subsection{p $\ll$ n}
+\begin{enumerate}
+\item Use k-fold CV. And Stratified k-fold to preserve class proportions.
+\end{enumerate}
+
+
+
+%%----------------
+\section{Large Dataset}
+
+\subsection{Out-of-core learning}
+\label{subsec:outofcorelearning}
+
+\begin{itemize}
+\item For handling large datasets which cannot be accommodated in the memory.
+\item Partial fit function using stochastic gradient descent is used here.
+
+\end{itemize} 
+
+\subsection{Caching}
+\begin{itemize}
+\item Performance could be improved with a sophisticated caching strategy, e.g. by sharding the images to reduce random access disk I/O. 
+\item {\color{cyan} tqdm module} for caching.
+\end{itemize}
+
+%--------------------------------
+\chapter{Data Transformation}
+The various data transformation methods available for preprocessing and for addressing non-linear decision boundaries.
+
+
+%%----------------
+\section{Augmenting Data}
+\label{sec:augmentdata}
+Accuracy can be improved by augmenting to the data and then fitting the model with both the original and augmented datasets. Some examples are
+
+\begin{itemize}
+\item Adding random noise to the data.
+\item In case of images, random rotations of the images.
+\end{itemize}
+
+
+%%----------------------
+\section{Embedding}
+Embedding of characters and words in character/language modeling is a popular way of encoding in DL.
+\begin{itemize}
+\item Efficient, dense represention
+\item A hyperparameter - 8 for small datasets to 1024 for large.
+\item A high dimensional embedding can capture fine-grained relationships between words but takes more data to learn.
+\item A simple model could yield more interpretable embeddings.
+\end{itemize}
+
+
+%%----------------------
+\section{Bag-of-Words}
+To convert text to numerics.
+\begin{enumerate}
+\item n-gram model ({\color{cyan}Tokenizer in Keras})
+\item {\color{cyan}CountVectorizer in sklearn}
+\item In case of large datasets, Hashing Vectorizer can be used. See \nameref{subsec:outofcorelearning} \autoref{subsec:outofcorelearning}.
+\end{enumerate}
+
+\subsection{NLP}
+\begin{itemize}
+
+\item When handling multiple documents, a different parameter accounting for the frequency of occurrences is \textbf{\textit{term-frequency - inverse document frequency}}.
+
+\item In \textbf{NLP}, punctuation marks and emoticons could reveal useful information, and hence, should not be discarded.
+
+\item Use of \textbf{\textit{word stemming}} and \textbf{\textit{lemmatization}} helps obtain the grammatically correct form of the word.
+
+\item Another important step is \textbf{\textit{stop-word removal}}, i.e. removal of words such as 'and', 'is', 'has' and 'like' which contain little or no useful information that can be used to distinguish between different classes of documents.
+
+\item Start and End tokens added to each sentence to handle variable input sizes before training with Encoder-Decoder (see Forecasting document).
+
+\end{itemize}
+
+%%----------------------
+\section{Log Transformation}
+This transformation could result in the distribution appearing bell-like or normal.
+%%----------------------
+\section{Differencing}
+In the case of time-series forecasting, differencing to remove a trend or seasonality should be carried out, after which, scaling and transformations should be implemented.
+%%----------------------
+\section{Power Transformation}
+
+\paragraph{Definition (from wiki)}: In statistics, a power transform is a family of functions that are applied to create a monotonic transformation of data using power functions. This is a useful data transformation technique used to stabilize variance, make the data more normal distribution-like, improve the validity of measures of association such as the Pearson correlation between variables and for other data stabilization procedures. One example is Box-Cox transformation.
+
+\paragraph{Applications (from wiki):} Power transforms are ubiquitously used in various fields. For example, multi-resolution and wavelet analysis, statistical data analysis, medical research, modeling of physical processes, geochemical data analysis, epidemiology and many other clinical, environmental and social research areas.
+
+%%----------------------
+\section{Using DL}
+Neural networks can be used for feature extraction which then can be used as inputs to the traditional ML algorithms, e.g. used in statistical machine translation system.
+
+%--------------------------------
+\chapter{Curse of Dimensionality}
+The ML algorithms significantly affected by high dimensions.
+
+\begin{enumerate}
+\item KNN
+\item KMeans
+\item DBSCAN
+\item SVM
+\end{enumerate}
+
+
+
+
+\end{document}
+
+% Notes
+% 1. Several empty lines are treated as one empty line.
+% 2. The main function of an empty line is to start a new paragraph.
+% 3. In general, LATEX ignores blank lines and other empty space in the .tex file. Two backslashes (\\) can be used to start a new line.
+% 4. If you want to add blank space into your document use the \vspace{...} command.\vspace{12pt} will add space equivalent to the height of a 12pt font.

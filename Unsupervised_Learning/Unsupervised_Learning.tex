@@ -1,0 +1,220 @@
+\documentclass[a4paper, 12pt]{report}
+
+\usepackage{hyperref}
+\usepackage{titlesec}
+
+\usepackage{lipsum} %for random text: use as \lipsum[num1 or num1-num2]
+
+\usepackage{color} %can change the background of the text also
+
+
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries}{}{0pt}{\Huge}
+
+\setlength{\parindent}{0in}
+
+
+
+\begin{document}
+\title{Unsupervised Learning Notes}
+\author{Sameer Kesava PhD}
+%\date{\today} % or {Month year}
+\maketitle
+
+\pagenumbering{roman}
+\tableofcontents
+\newpage
+
+\pagenumbering{arabic}
+
+%\setcounter{section}{0}
+
+%-------------------------
+\chapter{Clustering}
+The goal of clustering is to find natural groupings in the data.
+\\
+
+Since there are no ground truth labels in unsupervised learning, the use of intrinsic performance metrics and domain knowledge is required to evaluate the quality of clustering.\\
+
+In general, observations can be clustered on the basis of features and vice-versa, i.e. \textit{features can be clustered}.
+%%---------------------
+\section{ML Algorithms}
+\paragraph{The different clustering algorithms and their properties.}
+
+\subsection{Principal Component Analysis}
+\label{PCA}
+
+Popular applications of PCA:
+\begin{enumerate}
+\item EDA
+\item Denoising of signals, e.g. stock market data, genome data and gene expression levels.
+\end{enumerate}
+
+The features should be standardized to a $\sigma$=1 and, preferably, $\mu$=0 before using PCA. 
+
+\vspace{12pt}
+Kernels:
+\begin{enumerate} %itemsize for bulleted list
+
+\item Linear
+\item Radial (RBF): for non-linear datasets.
+\begin{itemize}
+%any symbol or word can be used in []
+\item[-] Gaussian kernel function: $\gamma$ is the hyperparameter.
+\end{itemize}
+
+\end{enumerate}
+
+PCA tends to perform well in cases where most of the information is captured by the first few principal components. This can be obtained as variance explained ratios implemented in sklearn as pca.explained\_variance\_ratio\_, and plotted as a \textbf{Scree plot} (elbow points in this plot gives an estimate for the choice of no. of PCs to choose for further processing).
+
+\paragraph{Biplots:}for visualizing PC scores and loading vectors.
+
+
+\subsection{Latent Dirichlet Allocation}
+\begin{itemize}
+\item Unsupervised Learning
+\item For topic modeling, e.g. classifying a newspaper as a topic.
+\item {\color{cyan}scikit-learn lda module} for batch and online learning.
+\end{itemize}
+
+\subsection{KMeans}
+\label{kmeans}
+\begin{itemize}
+\item This is a prototype-based clustering method where the clusters are represented by a centroid or mediod (from medians).
+\item Non-overlapping, i.e. an observation belongs to only 1 cluster.
+\item Elbow method and Silhouette plots (see \nameref{subsec:silanalysis} \autoref{subsec:silanalysis}) for determining the optimal number of clusters and the quality of clustering respectively.
+\item Once an optimal cluster number is chosen, the clustering should be repeated with different random initial configurations to check for consistent results since KMeans typically finds local optimum rather than global optimum.
+\item Furthermore, it is important to run the algorithm with a large \textbf{n$\_$init} value (in sklearn), else an undesirable local optimum could be obtained.
+\item Important to also set random seed for reproducibility.
+\item "Within-cluster variation": measure of the amount by which the observations within a cluster differ from each other.
+\end{itemize}
+
+\subsection{MeanShift}
+\begin{itemize}
+\item Distance-based clustering
+\item Has the ability to detect outliers.
+\end{itemize}
+
+\subsection{DBSCAN}
+Density-based spatial clustering of applications with Noise
+\begin{itemize}
+\item Hyperparameters: min$\_$samples, $\epsilon$ and $\epsilon$-metric.
+\item Has the ability to detect outliers.
+\item Works well for non-linear data.
+\item Affected by the curse of dimensionality.
+\end{itemize}
+
+\subsection{BIRCH}
+\begin{itemize}
+\item A hierarchical clustering method.
+\end{itemize}
+
+\subsection{Agglomerative}
+\begin{itemize}
+\item A hierarchical clustering method.
+\item Uses dendograms for visualization from which the number of clusters is chosen typically by eye.
+\item Scaling the features to have a $\sigma$ = 1 is very important, else, some features might have no influence/weights.
+\item Hierarchical clustering does not work in cases where are clusters within clusters, e.g. a group of people with 50-50 gender split, which in turn, is evenly split among different nationalities. 
+\item Hyperparameters
+\begin{enumerate}
+\item Distance-metric, i.e. similarity between observations.
+\begin{enumerate}
+\item Euclidean
+\item Minkowski
+\item Correlation-based. E.g. Online retailer interested in clustering shoppers based on their past shopping histories would prefer to use correlation-based distance metric rather than Euclidean. Used when p$>$2.
+\end{enumerate}
+\item Linkage: 
+\begin{enumerate}
+\item Average and complete linkage yield more balance dendograms, and hence, preferred by statisticians (may be also single linkage). 
+\item Centroid linkage often used in genomics but suffers with inversion drawback, where, sometimes, the clusters are fused at a height below either of the individual clusters.
+\end{enumerate}
+\end{enumerate}
+
+\end{itemize}
+
+
+\subsection{Manifold Learning}
+
+\subsection{Spectral Clustering}
+Advanced clustering method.
+
+\subsection{UMAP}
+\begin{itemize}
+\item Feature extraction method
+\item Non-linear dimensionality reduction
+\end{itemize}
+
+\subsection{t-SNE}
+t-SNE is only for visualization and not for data preprocessing.
+
+\subsection{triMAP}
+
+%%----------------
+%\section{Brute-Force}
+%\label{sec:bruteforce}
+
+%Brute-force algorithm is effective for small datasets.\\
+%Query time grows as O[pn], where p is the number of features/predictors/dimensions and n is no. of data points.
+
+%%-----------------------
+\section{Small Dataset}
+\label{sec:smalldatasize}
+n: number of samples\\
+p: number of features/predictors
+
+
+When p $>$ n, then there is no unique solution - variance is $\infty$.
+\subsection{When p is comparable to or greater than n}
+\begin{enumerate}
+
+\item Use feature extraction methods such as PCA or UMAP.
+%\item Check \nameref{sec:bruteforce} \autoref{sec:bruteforce}.
+
+\end{enumerate}
+
+%\subsection{Batch Size}
+%If feasible, training should be tried on the whole data at once rather than splitting into mini-batches.
+
+%%-----------------------
+\section{Diagnostic Tools}
+\subsection{Silhouette Analysis}
+\label{subsec:silanalysis}
+\begin{itemize}
+\item Measure of how tightly the clusters are grouped.
+\end{itemize}
+
+%%-----------------------
+\section{Practical Issues with Clustering}
+\begin{enumerate}
+\item There is no single right answer. Hence, domain knowledge is important.
+\item Different hyperparameters should be explored and the results examined for patterns that consistently emerge.
+\item Clustering is not robust to perturbations to the data. Hence, clustering on subsets of the data should be attempted and the results examined.
+\item The clustering results should not be taken a s the absolute truth.
+\item {\color{red}?}Mixture models are an attractive approach for acommodating the presence of outliers, e.g. soft version of KMeans and DBSCAN.
+\end{enumerate}
+
+%------------------------
+\chapter{Autoencoders}
+\begin{itemize}
+\item Image-generation with DL is done by learning latent spaces/hidden unit values that capture statistical information about a dataset of images.
+\end{itemize}
+
+%%-----------------
+\section{Variational Autoencoders}
+
+%------------------------
+\chapter{Applications}
+\begin{enumerate}
+\item Cybersecurity
+\item Medical sciences such as gene expression
+\item Marketing
+\end{enumerate}
+
+
+\end{document}
+
+% Notes
+% 1. Several empty lines are treated as one empty line.
+% 2. The main function of an empty line is to start a new paragraph.
+% 3. In general, LATEX ignores blank lines and other empty space in the .tex file. Two backslashes (\\) can be used to start a new line.
+% 4. If you want to add blank space into your document use the \vspace{...} command.\vspace{12pt} will add space equivalent to the height of a 12pt font.

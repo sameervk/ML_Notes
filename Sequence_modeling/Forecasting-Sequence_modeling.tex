@@ -1,0 +1,271 @@
+\documentclass[a4paper, 12pt]{report}
+
+\usepackage{hyperref}
+\usepackage{titlesec}
+
+\usepackage{lipsum} %for random text: use as \lipsum[num1 or num1-num2]
+
+\usepackage{color} %can change the background of the text also
+
+
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries}{}{0pt}{\Huge}
+
+
+\setlength{\parindent}{0in}
+
+
+\begin{document}
+\title{Notes on Forecasting/Sequence Modeling}
+\author{Sameer Kesava PhD}
+%\date{\today} % or {Month year}
+\maketitle
+
+\pagenumbering{roman}
+\tableofcontents
+\newpage
+
+\pagenumbering{arabic}
+
+%\setcounter{section}{0}
+
+\chapter{Framework}
+A set of questions needs to be clearly answered to understand and frame the time-series forecasting problem.
+
+\begin{enumerate}
+\item What are the Inputs and Outputs for the forecast?
+\item What are the Endogenous and Exogenous variables?
+\item Is the data Structured or unstructured?
+\item Is it a Regression or Classification problem?
+\item Is it a Univariate or Multivariate problem?
+\item Does the problem require a Static or Dynamic model?
+\item Is the data Contiguous or Discontiguous?
+\end{enumerate}
+
+\chapter{Improving the Accuracy}
+\section{Issues}
+\label{sec:issues}
+\begin{itemize}
+\item[-] Long term dependencies is a problem.
+\end{itemize}
+
+\subsection{Vanishing Gradient}
+LSTM or GRU architecture helps resolve this problem.
+
+\subsection{Exploding Gradient}
+\begin{enumerate}
+\item Gradient clipping
+\item Nonlinear activation functions such as relu6.
+\end{enumerate}
+
+
+%%----------------------
+\section{Weights}
+Parameter sharing is the main feature of RNNs. The parameters, i.e. same weights, are shared across several time steps.
+\label{sec:weights}
+\begin{enumerate}
+\item Sample or Class weights can be used to improve the prediction accuracy.
+\item Alternatively, a user-defined function can be supplied to compute the weights.
+
+\subsection{ML}
+
+\subsection{DL}
+\begin{enumerate}
+\item A good starting values for the initializers are Glorot-Xavier or Orthogonal for the weights.
+\item For the bias, zeros suffice.
+\end{enumerate}
+\end{enumerate}
+
+
+
+\section{Brute-Force}
+\label{sec:bruteforce}
+
+Brute-force algorithm is effective for small datasets.\\
+Query time grows as O[pn], where p is the number of features/predictors/dimensions and n is no. of data points.
+
+\section{Small Dataset}
+\label{sec:smalldatasize}
+n: number of samples\\
+p: number of features/predictors
+
+\subsection{When p is comparable to n}
+\begin{enumerate}
+
+\item Use shrinkage methods such as Lasso or L1 norm.
+%\item Check \hyperref[bruteforce]{\ref{bruteforce}}.
+\item Check \nameref{sec:bruteforce} \autoref{sec:bruteforce}.
+
+\end{enumerate}
+
+\subsection{p ${\ll}$ n}
+\begin{enumerate}
+\item Use k-fold CV.
+\end{enumerate}
+
+\section{Embedding}
+Embedding of characters and words in character/language modeling is a popular way of encoding in sequence modeling.
+
+\section{Statefulness}
+\begin{itemize}
+\item Stateful = True, i.e. in many-to-many sequence modeling, where there is one-to-one mapping between row i of batch j with row i of batch j+1.
+\end{itemize}
+
+\section{Norm of the Gradient}
+\begin{itemize}
+\item During training, the norm of the gradient clipped can also be dynamically adjusted ({\color{green}from NIPS:Oral Session 4 -Ilyasuts}).
+\end{itemize}
+
+\section{Curriculum Learning}
+To help stabilize the model's open-loop output.
+
+\section{Teacher Forcing}
+Used in \nameref{sec:enc-dec} \autoref{sec:enc-dec} where the target word is passed as the next input to the decoder.
+
+\section{Hyperparameter Tuning}
+\begin{itemize}
+\item Hyperparameter optimization based on Gaussian Process Regression and Bayesian Optimization
+\item keras tuner in keras
+\item GridSearchCV or RandomSearchCV in scikit-learn
+\item RandomSearch can be used as the baseline against which optimization algorithms can be evaluated.
+\end{itemize}
+
+%-------------------------------
+\chapter{ML Methods}
+
+\section{ARIMA}
+\begin{itemize}
+\item Implemented in statsmodel.
+\item Cannot model seasonal trends. Hence, differencing should be carried out to remove this.
+\end{itemize}
+
+%%----------------
+\section{XGBoost}
+Highly popular classifier and regressor. 
+\begin{itemize}
+\item Gradient boosting method
+\item Absolute loss and Huber loss more robust to outliers.
+\end{itemize}
+
+
+
+%-------------------------------
+\chapter{DL Methods}
+All operations, e.g. loss functions, activation functions, in neural networks must be differentiable.
+
+\begin{itemize}
+\item If the sequences are not of the same size, e.g. Sentiment Analysis, either padding or masking can be used.
+\end{itemize}
+
+%%----------------
+\section{Binary Classification}
+\begin{itemize}
+\item Should end with a dense layer of 1 unit and a sigmoid activation function.
+\item The loss function should be binary cross-entropy.
+\end{itemize}
+
+%%--------------------
+\section{CNN-LSTM}
+\label{sec:cnn-lstm}
+Hyrbid model.
+
+\begin{itemize}
+\item {\color{red}Invariance is hard-coded in CNNs.(?)}
+
+\end{itemize}
+
+%%--------------------
+\section{ConvLSTM}
+Hybrid model.
+%%--------------------
+\section{TreeRNN}
+
+%%--------------------
+\section{Bidirectional RNN}
+\begin{itemize}
+\item Helps RNN learn long range dependencies in the sequences.
+\item For language modeling.
+\end{itemize}
+
+%%--------------------
+\section{Encoder-Decoder}
+\label{sec:enc-dec}
+\begin{enumerate}
+\item Bahdanau et al. - RNN encoder, RNN decoder with Attention, i.e. contextual output from the encoder as input to the decoder.
+\item In Neural Machine Translation (NMT), where the above method was applied, the encoder output is trained to capture the semantic information, which is then passed to the decoder.
+\end{enumerate}
+
+%-------------------------------
+\chapter{Loss Functions}
+
+\section{Sparse Categorical Cross Entropy}
+To be used when the labels are not one-hot encoded.
+
+\section{Binary Cross Entropy}
+\begin{enumerate}
+\item If the labels have only 2 unique values, preferably [0,1] or [-1,1].
+\item Use sigmoid activation function for [0,1] and tanh for [-1,1].
+\end{enumerate}
+
+\section{KL Divergence}
+If each label is a probability distribution, e.g. image segmentation.
+
+\section{Perplexity}
+A function used in language modeling: e$^{Loss}$
+
+%-----------------------------
+\chapter{Metrics}
+
+\section{BLEU score}
+Used in language modeling, e.g. {\color{green}Bahdanau et al. paper; \nameref{sec:enc-dec} \autoref{sec:enc-dec}}.
+
+
+%-----------------------------
+\chapter{Optimizers}
+\begin{enumerate}
+\item If the training and validation accuracies with epoch jump around, then learning rate must be reduced.
+\end{enumerate}
+\section{Stochastic Gradient Descent}
+\begin{itemize}
+\item[-] For training one sample at a time.
+
+\item[-] For online learning.
+\end{itemize}
+
+\section{Mini-batch Gradient Descent}
+\begin{itemize}
+\item[-] For mini-batches typically of the order of 2$^x$ for GPU compatibility.
+\item[-] Examples are Adam, Adagrad, RMSProp, etc.
+\end{itemize}
+
+
+\chapter{Overfitting}
+
+\section{DL}
+\begin{itemize}
+\item L1, L2, L1L2 regularization
+\item Dropout
+\item Batch Normalization
+\item Reduce the complexity of the network especially if the data size is small.
+\end{itemize}
+
+\subsection{Dropout}
+\begin{itemize}
+
+\item For a RNN layer, there are 3 dropouts: for the input from the previous layer, output of the layer and the recurrent dropout.
+\item Dropout functions
+\begin{enumerate}
+\item Gaussian Dropout
+\end{enumerate}
+\end{itemize}
+
+
+\end{document}
+
+
+
+% Notes
+% 1. Several empty lines are treated as one empty line.
+% 2. The main function of an empty line is to start a new paragraph.
+% 3. In general, LATEX ignores blank lines and other empty space in the .tex file. Two backslashes (\\) can be used to start a new line.
+% 4. If you want to add blank space into your document use the \vspace{...} command.\vspace{12pt} will add space equivalent to the height of a 12pt font.
