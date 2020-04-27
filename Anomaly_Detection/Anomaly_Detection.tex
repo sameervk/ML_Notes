@@ -15,7 +15,7 @@
 \begin{document}
 \title{Notes on Anomaly Detection}
 \author{Sameer Kesava PhD}
-%\date{\today} % or {Month year}
+\date{} % or {Month year}
 \maketitle
 
 \pagenumbering{roman}
@@ -65,9 +65,20 @@ Highly popular classifier and regressor.
 
 %%----------------
 \section{MeanShift Clustering}
+\begin{itemize}
+\item Distance-based clustering
+\item Has the ability to detect outliers.
+\end{itemize}
 
 %%----------------
 \section{DBSCAN}
+Density-based spatial clustering of applications with Noise
+\begin{itemize}
+\item Hyperparameters: min$\_$samples, $\epsilon$ and $\epsilon$-metric.
+\item Has the ability to detect outliers.
+\item Works well for non-linear data.
+\item Affected by the curse of dimensionality.
+\end{itemize}
 
 %-----------------------------------
 \chapter{Improving the Accuracy}
