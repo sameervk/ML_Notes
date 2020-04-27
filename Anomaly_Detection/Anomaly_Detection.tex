@@ -1,0 +1,99 @@
+\documentclass[a4paper, 12pt]{report}
+
+\usepackage{hyperref}
+\usepackage{titlesec}
+
+\usepackage{lipsum} %for random text: use as \lipsum[num1 or num1-num2]
+
+\usepackage{color} %can change the background of the text also
+
+
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries}{}{0pt}{\Huge}
+
+
+\begin{document}
+\title{Notes on Anomaly Detection}
+\author{Sameer Kesava PhD}
+%\date{\today} % or {Month year}
+\maketitle
+
+\pagenumbering{roman}
+\tableofcontents
+\newpage
+
+\pagenumbering{arabic}
+
+%\setcounter{section}{0}
+
+%-----------------------------------
+\chapter{Supervised Learning Algorithms}
+
+%%----------------
+\section{Univariate Data}
+\begin{itemize}
+\item Boxplot
+\item Grubbs test
+\item RANSAC algorithm for linear regression
+\item Studentized residuals and leverage points. Easy to plot for univariate data.
+\end{itemize}
+
+%%----------------
+\section{Multivariate Data}
+
+%%----------------
+\section{Random Cut Forest}
+From Amazon SageMaker
+
+%%----------------
+\section{XGBoost}
+Highly popular classifier and regressor. 
+\begin{itemize}
+\item Gradient boosting method
+\item Absolute loss and Huber loss more robust to outliers.
+\item Hyperparameters
+\begin{enumerate}
+\item Max$\_$depth
+\item Colsample$\_$bytree
+\item Eta
+\item train-test split: 60-40/70-30/80-20.
+\end{enumerate}
+\end{itemize}
+
+%-----------------------------------
+\chapter{Unsupervised Learning Algorithms}
+
+%%----------------
+\section{MeanShift Clustering}
+
+%%----------------
+\section{DBSCAN}
+
+%-----------------------------------
+\chapter{Improving the Accuracy}
+%%----------------
+\section{Hyperparameter Tuning}
+\begin{itemize}
+\item Hyperparameter optimization based on Gaussian Process Regression and Bayesian Optimization
+\item keras tuner in keras
+\item GridSearchCV or RandomSearchCV in scikit-learn
+\item RandomSearch can be used as the baseline against which optimization algorithms can be evaluated.
+\end{itemize}
+
+\begin{thebibliography}{999}
+\bibitem{pankaj_2015}
+	Pankaj Malhotra et al.,
+	Long Short Term Memory Networks for Anomaly Detection in Time Series,
+	2015.
+\end{thebibliography}
+
+
+
+
+
+
+
+
+
+
+\end{document}
