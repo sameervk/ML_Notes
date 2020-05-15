@@ -1,0 +1,235 @@
+\documentclass[11pt]{article}
+
+\usepackage[a4paper, left=20mm, right=20mm, top = 20mm, bottom=20mm]{geometry}
+
+\usepackage{hyperref}
+
+\usepackage{titlesec}
+
+\usepackage{amsmath}
+
+\usepackage{mathtools}
+
+\usepackage{multicol}
+\setlength{\columnsep}{0.75cm}
+
+\usepackage{lipsum} %for random text: use as \lipsum[num1 or num1-num2]
+
+\usepackage{color} %can change the background of the text also
+
+
+%\titleformat{\chapter}[display]{\normalfont\bfseries}{}{0pt}{\Huge}
+
+\setlength{\parindent}{0in}
+
+\title{Notes on TensorFlow}
+\author{Sameer Kesava PhD}
+%\date{\today} % or {Month year}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+\noindent Important points on coding in tensorflow and keras with tensorflow backend. Tensorflow objects rather than Python objects preferrable for defining and training in tensorflow.
+\end{abstract}
+
+
+%\pagenumbering{roman}
+%\tableofcontents
+%\newpage
+
+\pagenumbering{arabic}
+
+%\setcounter{section}{0}
+
+\begin{multicols*}{2}
+
+\paragraph{version 2.1 \label{version}}
+%%---------------------
+\section{Estimators}
+\begin{itemize}
+\item Estimators are like scikit-learn pipelines.
+\item For training models for distributed environments.
+\end{itemize}
+
+%%---------------------
+\section{Data Formats}
+\begin{itemize}
+\item Use a combination of protobuf and tf.recordIO to speed up training.
+\item Inputs must better be converted to float32 (float64 rarely encountered) since certain layers like dropout or batchnorm will throw out a "Value Error" if the inputs are not of floating point type.
+\end{itemize}
+
+%%---------------------
+\section{Images}
+\begin{itemize}
+\item tf.image module for formatting images.
+\item Resizing can be done using methods such as bilinear, lanczos, etc.
+\item tf.keras.preprocessing.image.array$\_$to$\_$img()
+\end{itemize}
+
+%%---------------------
+\section{Python Scopes}
+\begin{enumerate}
+\item Global: should be explicitly defined.
+\item Nonlocal: same as above.
+\item local
+
+\end{enumerate}
+
+Functions within function give greater control when also including scopes such as global and nonlocal.
+
+%%---------------------
+\section{Array Broadcasting}
+\begin{itemize}
+\item In numpy and tensorflow, the smaller array is "broadcast" across a larger array so that they have compatible shapes.
+\item \textbf{Broadcasting Rule:} In order to broadcast, the size of the trailing axes for both arrays in an operation must either be the same size or one of them must be one.
+\end{itemize}
+
+%%---------------------
+\section{Debugging in TensorFlow}
+tf.debugging
+
+%%--------------------
+\section{Logits}
+\begin{itemize}
+\item The argument "from$\_$logits" that is passed to the loss function should be carefully reviewed. If the last layer has a softmax activation, then from$\_$logits must be set to False.
+\item If the y labels are negative and not one-hot encoded, using from$\_$logits = False will lead to wrong normalization.
+\item See \textbf{Candidate Sampling} for training data containing large number of classes.
+\end{itemize}
+
+
+%%---------------------
+\section{Transfer Learning}
+
+\subsection{Regularization}
+Adding regularizers to pre-trained models is not straightforward.
+\begin{enumerate}
+\item Load the pre-trained model and add regularizers to the desired layers.
+\item Save the model to a json or yaml object.
+\item Save the model weights.
+\item Delete this model and create a new one using the json object.
+\item Load the saved weights into this model.
+\item Check for the layers where the regularizers were added, should be created now.
+\end{enumerate}
+
+
+%%----------------------
+\section{Padding}
+\begin{itemize}
+\item tf.keras.preprocessing.sequence.pad$\_$sequences
+\item Post-padding is recommended to be able to use CuDNN implementation of the layers.
+\end{itemize}
+
+%%----------------------
+\section{Masking}
+\begin{itemize}
+\item Masking is required to inform the model that some part of the data has padding.
+\item In models using functional or sequential API, the masks are propagated directly.
+\item However, in subclassed models, the mask arg. must be explicity passed to the call method. E.g. the compute$\_$mask method of the embedding layer can be passed as an arg. to the call method of the next layer like LSTM.
+\end{itemize}
+
+%%----------------------
+\section{Embedding}
+\begin{itemize}
+\item tf.nn.embedding$\_$lookup(): returns the embedded values of the inputs from the embedding tensor.
+\end{itemize}
+
+%%----------------------
+\section{Tokenizer}
+\begin{itemize}
+\item For text generation: tf.keras.preprocessing.text. Tokenizer(). Also used in image captioning with visual attention.
+\end{itemize}
+
+%%----------------------
+\section{Dense Layer}
+\begin{itemize}
+\item Can take input of more than 2 dimensions.
+\end{itemize}
+
+%%----------------------
+\section{Gradient Calculation}
+\begin{itemize}
+  \item Variables not part of the gradient can be tracked using tape.watch().
+  \item \begin{enumerate}
+    \item tf.clip$\_$by$\_$value; tf.clip$\_$by$\_$norm for gradient clipping to address exploding gradient problem.
+  \end{enumerate}
+\end{itemize}
+
+%%----------------------
+\section{Other Layers}
+\begin{enumerate}
+\item Lambda layer: wraps arbitrary expressions such as lambda functions or other functions as a Layer object; helps improve portability of the models.
+\item Activation layer: Useful when outputs from multiple inputs are concatenated, and for Batch/Layer normalization layers.
+\end{enumerate}
+
+%%----------------------
+\section{Useful functions}
+It is preferrable to use tf objects, methods and functions as it enables serialization of the code possible and easy visualization in TensorBoard.
+
+\begin{enumerate}
+\item Check tf.keras.backend for useful functions.
+\item tf.map$\_$fn: applies a function to a tensor along an axis.
+\item tf.reduce$\_$sum: sum along axes; another important parameter is keepdims.
+\item tf.square: squaring the elements.
+\item tf.cond(bool, true func, false func): returns only a func. 
+	\begin{itemize}
+	\item Use lambda expression to return a tensor or other output or the functions must be callable. 
+	\item Objects in true func cannot be accessed by false func.
+	\item Outputs from both must be of the same type and shape.
+	\item Functions can return \textbf{None}.
+	\end{itemize}
+\item tf.nn.moments: for mean and variance. Important args: axes and keepdims.
+\item tf.reduce$\_$any: logical or along axes; keepdim arg.
+\item tf.reduce$\_$mean: mean along axes; keepdim arg.
+\item tf.equal: compares elements between 2 tensors. return bool.
+\item TensorSpec: for passing tensors with general shapes.
+\end{enumerate}
+
+%%----------------------
+\section{Tensor properties \nameref{version} \autoref{version}}
+\begin{itemize}
+
+\item tensor.assign() for assigning a new value or manipulating a tensor variable. For a specific index [m,n], use tensor[m,n].assign(). Direct assignment such as var = var + newvalue will cause issues.
+\item Do not directly use layer.weights for examining and manipulating, use the .numpy() or .read$\_$value().
+\item All tf.Variable objects that are not part of training must have their trainable attribute set to False.
+\end{itemize}
+
+%%----------------------
+\section{tf.Graph properties \nameref{version} \autoref{version}}
+It is very important to understand the graph-based training in tensorflow. The points below are based on my observations, might not be correct. Need to learn more about this.
+\begin{itemize}
+\item Once a graph is created, the variables are added to the graph. These variables cannot be reinitialized later but can be manipulated using the assign method.
+\end{itemize}
+
+%%----------------------
+\section{Keras Layer properties \nameref{version} \autoref{version}}
+\begin{itemize}
+\item A layers state is given by its weights/variables. Some layers are \textbf{stateless}, i.e. in these layers only data transformation occurs.
+\item When subclassing layers, parameters such as name, trainable and dtype can be passed to the init method, from where the trainable argument can be controlled.
+\item A layer's call arguments are inputs, training and mask.
+\end{itemize}
+
+
+%%----------------------
+\section{Keras Model properties \nameref{version} \autoref{version}}
+\begin{itemize}
+\item Keras.Model tracks both its variables and its internal layers.
+\item All the functions and methods of a model, including the functions corresponding to the inference mode, are evaluated when compiled. This is especially relevant for subclassed models.
+\item In order to reset some of the Variables in the model or its layers, the layers have to be passed a \textbf{stateful} argument during initialization like in RNN.
+	\begin{enumerate}
+	\item Directly assigning model.stateful = True will lead to AttributeError as stateful is a readonly property and hence cannot be directly assigned.
+	\item Thus, each layer must be passed a stateful argument. Also, it is not a kwarg for a keras layer.
+	\end{enumerate}
+	
+\end{itemize}
+
+
+
+%%----------------------
+\section{Keras Loss methods \nameref{version} \autoref{version}}
+\begin{enumerate}
+\item tf.keras.losses.Loss class can be subclassed to define custom loss functions.
+\end{enumerate}
+
+
+\end{multicols*}
+\end{document}
