@@ -42,10 +42,16 @@ For more information, please see \textbf{Deep Learning for Anomaly Detection: A 
 \section{DBSCAN}
 Density-based spatial clustering of applications with Noise
 \begin{itemize}
-\item Hyperparameters: min$\_$samples, $\epsilon$ and $\epsilon$-metric.
-\item Has the ability to detect outliers.
+\item Hyperparameters: 
+\begin{enumerate}
+\item min$\_$samples: controls how tolerant the algorithm is towards noise. Starting value: 2*dimension.
+\item$\epsilon$: crucial parameter; controls the local neighborhood of points. A starting value can be chosen using elbow/knee point in nearest neighbor plot.
+\item $\epsilon$-metric: euclidean, minkowski, etc.
+\end{enumerate}
+\item Has the ability to detect outliers: A sample that is not a core sample and is at least $\epsilon$ in distance from any sample is considered an outlier.
 \item Works well for non-linear data.
 \item Affected by the curse of dimensionality.
+\item OPTICS is a variant of DBSCAN, does not require $\epsilon$ to be set.
 \end{itemize}
 
 

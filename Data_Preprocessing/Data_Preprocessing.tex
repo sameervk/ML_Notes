@@ -103,6 +103,8 @@ PCA tends to perform well in cases where most of the information is captured by 
 
 \paragraph{Biplots:}for visualizing PC scores and loading vectors.
 
+\subsection{Neighborhood Component Analysis}
+Similar to PCA but for supervised learning.
 
 \subsection{Linear Discriminant Analysis}
 LDA classifier assumes that the observations are drawn from classes with a normal distribution of predictors while sharing a common variance $\sigma^2$.
@@ -117,7 +119,12 @@ QDA classifier assumes that the observations are drawn from classes with a norma
 \item Feature extraction method
 \item Non-linear dimensionality reduction
 \item Other such methods are \textbf{triMAP}.
+\end{itemize}
+
+\subsection{t-SNE}
+\begin{itemize}
 \item t-SNE is only for visualization and not for data preprocessing.
+\item Runs on the whole dataset: splitting the dataset into training and test is not possible.
 \end{itemize}
 
 
