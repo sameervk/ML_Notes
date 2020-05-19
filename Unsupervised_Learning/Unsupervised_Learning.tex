@@ -30,6 +30,17 @@
 %\setcounter{section}{0}
 
 %-------------------------
+\chapter{Introduction}
+The purpose of unsupervised learning is to
+\begin{enumerate}
+\item Finding hidden structures in the data
+\item Data visualization
+\item Data compression
+\item Data denoising
+\item Finding correlations
+\end{enumerate}
+
+%-------------------------
 \chapter{Clustering}
 The goal of clustering is to find natural groupings in the data.
 \\
@@ -208,12 +219,31 @@ When p $>$ n, then there is no unique solution - variance is $\infty$.
 
 %------------------------
 \chapter{Autoencoders}
+This comes under self-supervised learning.
 \begin{itemize}
 \item Image-generation with DL is done by learning latent spaces/hidden unit values that capture statistical information about a dataset of images.
 \end{itemize}
 
 %%-----------------
 \section{Variational Autoencoders}
+\begin{itemize}
+\item For generating new data
+\item GANs have been shown to provide better quality results compared to VA, although, VA is easier to train.
+\end{itemize}
+
+%%-----------------
+\section{Convolutional Autoencoders}
+\begin{itemize}
+\item Beware of checkerboard artifacts arising due to overlapping regions upon upsampling.
+\item Upsampling: unpooling layer using nearest-neighbor interpolation.
+\item Use formula: s(n-1) + k -2p for figuring out the padding during upsampling.
+
+\item Variant: conv-ae with randomforests
+	\begin{enumerate}
+	\item train the conv-ae
+	\item use the encoder as inputs to the classifier
+	\end{enumerate}
+\end{itemize}
 
 %------------------------
 \chapter{Applications}
