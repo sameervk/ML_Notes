@@ -41,6 +41,17 @@ Variance & = & <\hat{f}(X){^{2}}> - <\hat{f}(X)>{^{2}}\\
 \end{eqnarray}
 
 %%----------------
+\section{Datasets}
+\label{sec:datasets}
+\begin{itemize}
+\item Train, valid and test datasets should contain similar ratio of number of classes.
+\item The above datasets must be disjoint, i.e. any redundancy must not be used.
+\item If there are missing values, it is safe to input such values as zero if the value does not carry any weight.
+\item If test data is expected to have missing values, ensure training data does too so tht the NN can learn to ignore such values; can be artificially generated as noise.
+\end{itemize}
+
+
+%%----------------
 \section{Weights}
 \label{sec:weights}
 \begin{enumerate}
@@ -76,6 +87,7 @@ Variance & = & <\hat{f}(X){^{2}}> - <\hat{f}(X)>{^{2}}\\
 A useful feature selection technique
 
 \subsection{Ridge Regression or L2-norm}
+L2 regularization also called "weight-decay" in DL.
 
 \subsection{L1-L2 norm}
 \begin{itemize}
@@ -93,8 +105,11 @@ Query time grows as O[pn], where p is the number of features/predictors/dimensio
 Also see \nameref{sec:augmentdata} \autoref{sec:augmentdata}.
 \label{sec:smalldatasize}
 n: number of samples\\
-p: number of features/predictors
+p: number of features/predictors\\
 
+If different shuffling rounds during training leads to very different metrics during training, then the size of the dataset might not be sufficient.\\
+
+Careful feature engineering helps train a better model.\\
 
 When p $>$ n, then there is no unique solution - variance is $\infty$.
 \subsection{When p is comparable to n}
@@ -108,7 +123,7 @@ When p $>$ n, then there is no unique solution - variance is $\infty$.
 
 \subsection{p ${\ll}$ n}
 \begin{enumerate}
-\item Use k-fold CV.
+\item Use k-fold CV. Also, iterated k-fold CV where the dataset is shuffled before k-fold splitting.
 \end{enumerate}
 
 \subsection{Batch Size}
@@ -386,11 +401,15 @@ Helps address convergence speed and local minima.
 %------------------------------
 \chapter{Overfitting}
 \begin{itemize}
+\item Overfitting is a result of over-optimization over generalization.
 \item Random perturbation of the input data, e.g. images, to improve generalization.
 \end{itemize}
 %%----------------
 \section{ML}
-- See \nameref{subsec:bagging} \autoref{subsec:bagging}
+\begin{itemize}
+\item See \nameref{subsec:bagging} \autoref{subsec:bagging}
+\item L1,L2 regularization
+\end{itemize}
 
 %%----------------
 \section{DL}
@@ -407,6 +426,7 @@ Helps address convergence speed and local minima.
 \subsection{Dropout}
 \begin{itemize}
 \item Dropout functions
+\item Typical rates: 0.2-0.5
 \begin{enumerate}
 \item Gaussian Dropout
 \end{enumerate}
