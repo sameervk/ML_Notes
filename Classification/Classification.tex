@@ -206,6 +206,7 @@ Accuracy can be improved by augmenting to the data and then fitting the model wi
 \begin{itemize}
 \item Adding random noise to the data.
 \item In case of images, random rotations of the images.
+\item Using too many augmented images is also not advisable as these images are inter-correlated.
 \end{itemize}
 
 %%----------------
@@ -332,8 +333,29 @@ All operations, e.g. loss functions, activation functions, in neural networks mu
 \section{CNN}
 \label{sec:cnn}
 \begin{itemize}
+\item Convolutional layers learn local patterns whereas dense layers learn global structure.
 \item In CNNs, the higher the layer is, the more specialized it is. The first few layers learn very simple and generic features which generalize to almost all types of images. The higher the layer is, the features learnt are increasingly specific to the dataset on which the model is trained.
+\item The layers are defined by 2 key parameters
+	\begin{enumerate}
+	\item kernel size: typically 3x3 or 5x5
+	\item Filters: 32, 64, typically of the order of 2$^{n}$
+	\item Pooling operations are advised over strides for downsampling.
+	\end{enumerate}
+\item Typically, as the layer number increases, the no. of feature maps increases and the matrix dimension decreases (downsampling using pooling operations).
 \item {\color{red}Invariance is hard-coded in CNNs.(?)}
+\end{itemize}
+
+\subsection{Transfer Learning}
+\label{subsec:transflearning}
+\begin{itemize}
+\item When using pretrained models, use the convolutional base for feature extraction.
+\item The dense layers are largely useless for object detection.
+\item If the dataset differs a lot from the dataset used for the pretrained model, then not all CNN layers should be used, only the first few layers (a probable hyperparameter) are advised to be used.
+\item There are 2 ways to use a pretrained model (without fine-tuning)
+	\begin{enumerate}
+	\item Use the base for feature extraction and its output as input for custom model. Apparently, augmented data cannot be used here. {\color{red}not sure why? (from F.Chollet DLP book)}
+	\item Use the base as part of the model but with its trainable parameters frozen and then train the model with additional custom layers built on top.
+	\end{enumerate}
 \end{itemize}
 
 \subsection{Spatial Pyramid Pooling Layer}

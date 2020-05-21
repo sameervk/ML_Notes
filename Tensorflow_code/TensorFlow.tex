@@ -56,6 +56,7 @@
 \begin{itemize}
 \item Use a combination of protobuf and tf.recordIO to speed up training.
 \item Inputs must better be converted to float32 (float64 rarely encountered) since certain layers like dropout or batchnorm will throw out a "Value Error" if the inputs are not of floating point type.
+\item If the input file is loaded with numbers in the form of string type, then use \textit{ast.literal$\_$eval()} or \textit{json.loads()} to convert to numbers of type float.
 \end{itemize}
 
 %%---------------------
@@ -64,6 +65,8 @@
 \item tf.image module for formatting images.
 \item Resizing can be done using methods such as bilinear, lanczos, etc.
 \item tf.keras.preprocessing.image.array$\_$to$\_$img()
+\item tf.keras.preprocessing.image. ImageDataGenerator: excellent function for loading images from disk and \textbf{\textit{augmenting}} data (especially useful in the case of small datasets).
+\item tf.image.draw$\_$bounding$\_$boxes(): for drawing bounding boxes on images for image segmentation or objection detection.
 \end{itemize}
 
 %%---------------------
@@ -213,6 +216,7 @@ It is very important to understand the graph-based training in tensorflow. The p
 \section{Keras Model properties \nameref{version} \autoref{version}}
 \begin{itemize}
 \item Keras.Model tracks both its variables and its internal layers.
+\item A keras model can be used in the same way as a keras layer when building deeper models.
 \item All the functions and methods of a model, including the functions corresponding to the inference mode, are evaluated when compiled. This is especially relevant for subclassed models.
 \item In order to reset some of the Variables in the model or its layers, the layers have to be passed a \textbf{stateful} argument during initialization like in RNN.
 	\begin{enumerate}
